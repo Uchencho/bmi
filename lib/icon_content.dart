@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'constants.dart';
 
 class ReuseableIcon extends StatelessWidget {
   ReuseableIcon({@required this.genderText, @required this.genderIcon});
@@ -17,7 +18,7 @@ class ReuseableIcon extends StatelessWidget {
         SizedBox(height: 15.0),
         Text(
           this.genderText,
-          style: TextStyle(color: Color(0xFF8D8E98), fontSize: 18.0),
+          style: kLabelTextStyle,
         )
       ],
     );
