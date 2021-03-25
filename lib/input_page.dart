@@ -1,8 +1,11 @@
+import 'package:bmi/core/calculator_brain.dart';
+import 'package:bmi/result_page.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'icon_content.dart';
 import 'reusable_card.dart';
 import 'constants.dart';
+import 'buttons.dart';
 
 enum Gender { male, female }
 
@@ -148,18 +151,28 @@ class _InputPageState extends State<InputPage> {
                   ),
                   Expanded(
                     child: ReusableCard(
-                        colour: kActiveCardColor,
-                        cardChild: bottomCard(
-                            'AGE', this.age, reduceAge, increaseAge)),
+                      colour: kActiveCardColor,
+                      cardChild:
+                          bottomCard('AGE', this.age, reduceAge, increaseAge),
+                    ),
                   ),
                 ],
               ),
             ),
-            Container(
-              height: kBottomContainerHeight,
-              color: kBottomContainerColor,
-              width: double.infinity,
-              margin: EdgeInsets.only(top: 10.0),
+            BottomButton(
+              bottonTitle: 'CALCULATE',
+              onTap: () {
+                CalculatorBrain calc =
+                    CalculatorBrain(height: height, weight: weight);
+
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return ResultsPage(
+                    bmiResult: calc.calculateBMI(),
+                    resultText: calc.getResult(),
+                    interpretation: calc.getInterpretation(),
+                  );
+                }));
+              },
             )
           ],
         ));
@@ -181,37 +194,6 @@ class _InputPageState extends State<InputPage> {
           ],
         ),
       ],
-    );
-  }
-}
-
-class BottomCard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column();
-  }
-}
-
-class RoundIconButton extends StatelessWidget {
-  RoundIconButton({@required this.icon, this.onPressed});
-
-  final IconData icon;
-  final Function onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return RawMaterialButton(
-      onPressed: () {
-        onPressed();
-      },
-      elevation: 0.0,
-      child: Icon(icon),
-      constraints: BoxConstraints.tightFor(
-        width: 40.0,
-        height: 40.0,
-      ),
-      fillColor: Color(0xFF4C4F5E),
-      shape: CircleBorder(),
     );
   }
 }
