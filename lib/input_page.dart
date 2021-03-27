@@ -9,6 +9,9 @@ import 'buttons.dart';
 
 enum Gender { male, female }
 
+enum ProperType { WEIGHT, AGE }
+enum ActionType { ADD, SUBTRACT }
+
 class InputPage extends StatefulWidget {
   @override
   _InputPageState createState() => _InputPageState();
@@ -20,40 +23,9 @@ class _InputPageState extends State<InputPage> {
   int weight = 50;
   int age = 18;
 
-  void increaseHeight() {
-    setState(() {
-      height++;
-    });
-  }
-
-  void reduceHeight() {
-    setState(() {
-      height--;
-    });
-  }
-
-  void increaseWeight() {
-    setState(() {
-      weight++;
-    });
-  }
-
-  void reduceWeight() {
-    setState(() {
-      weight--;
-    });
-  }
-
-  void increaseAge() {
-    setState(() {
-      age++;
-    });
-  }
-
-  void reduceAge() {
-    setState(() {
-      age--;
-    });
+  void reRenderViews(){
+    //Use Bloc architecture to update view
+    setState(() {});
   }
 
   @override
@@ -109,7 +81,7 @@ class _InputPageState extends State<InputPage> {
                     Text('HEIGHT', style: kLabelTextStyle),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(height.toString(), style: kHeightTextStyle),
                         Text('cm', style: kLabelTextStyle)
@@ -128,9 +100,8 @@ class _InputPageState extends State<InputPage> {
                       child: Slider(
                           value: height.toDouble(),
                           onChanged: (double d) {
-                            setState(() {
                               height = d.toInt();
-                            });
+                              reRenderViews();
                           },
                           inactiveColor: kInactiveCardColor,
                           min: kMinHeight,
@@ -146,14 +117,26 @@ class _InputPageState extends State<InputPage> {
                   Expanded(
                     child: ReusableCard(
                         colour: kActiveCardColor,
-                        cardChild: bottomCard('WEIGHT', this.weight,
-                            reduceWeight, increaseWeight)),
+                        cardChild: bottomCard('WEIGHT', this.weight, (){
+                              this.weight = weight.updateAction(ActionType.SUBTRACT);
+                                reRenderViews();
+                          }, (){
+                                this.weight = weight.updateAction(ActionType.ADD);
+                                reRenderViews();
+                            })
+                    ),
                   ),
                   Expanded(
                     child: ReusableCard(
                       colour: kActiveCardColor,
                       cardChild:
-                          bottomCard('AGE', this.age, reduceAge, increaseAge),
+                          bottomCard('AGE', this.age, (){
+                            this.age = age.updateAction(ActionType.ADD);
+                            reRenderViews();
+                          }, (){
+                            this.age = age.updateAction(ActionType.ADD);
+                            reRenderViews();
+                          }),
                     ),
                   ),
                 ],
@@ -188,7 +171,10 @@ class _InputPageState extends State<InputPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            RoundIconButton(icon: FontAwesomeIcons.minus, onPressed: reduce),
+            RoundIconButton(icon: FontAwesomeIcons.minus, onPressed: (){
+              print("weight reduce called");
+              reduce();
+            }),
             SizedBox(width: 10.0),
             RoundIconButton(icon: FontAwesomeIcons.plus, onPressed: increase)
           ],
@@ -196,4 +182,20 @@ class _InputPageState extends State<InputPage> {
       ],
     );
   }
+}
+
+extension NumberActions on int {
+
+    int updateAction(ActionType actionType, {int value = 1}) {
+      int currentValue  = this;
+      switch (actionType) {
+        case ActionType.ADD:
+          return currentValue += value;
+          break;
+        case ActionType.SUBTRACT:
+          return currentValue -= value;
+          break;
+        default: return currentValue;
+      }
+    }
 }
